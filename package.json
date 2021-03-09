@@ -15,13 +15,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hodgef/js-library-boilerplate"
+    "url": "https://github.com/tmarshall/mrkrjs"
   },
   "author": "Tanner Marshall <tannersmarshall@gmail.com> (https://github.com/tmarshall07)",
   "bugs": {
-    "url": "https://github.com/hodgef/js-library-boilerplate/issues"
+    "url": "https://github.com/tmarshall07/mrkrjs/issues"
   },
-  "homepage": "https://github.com/hodgef/js-library-boilerplate",
+  "homepage": "https://github.com/tmarshall07/mrkrjs",
   "keywords": [
     "library"
   ],
