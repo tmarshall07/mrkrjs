@@ -6,7 +6,7 @@ function isTextNode(node: Node): node is Text {
 interface Props {
   element?: HTMLElement;
   className?: string;
-  enabled?: boolean;
+  selectionEnabled?: boolean;
 }
 
 interface Range {
@@ -19,14 +19,14 @@ interface Range {
 export default class Highlighter {
   element: HTMLElement;
   highlightClass: string;
-  enabled: boolean;
+  selectionEnabled: boolean;
 
   constructor(props: Props = {}) {
-    const { element = document.body, className = 'highlight', enabled = true } = props;
+    const { element = document.body, className = 'highlight', selectionEnabled = false } = props;
 
     this.element = element;
     this.highlightClass = className;
-    this.enabled = enabled;
+    this.selectionEnabled = selectionEnabled;
 
     this.setContainerElement(element);
 
@@ -35,7 +35,7 @@ export default class Highlighter {
   }
 
   handlePointerUp() {
-    if (this.enabled) {
+    if (this.selectionEnabled) {
       this.highlightSelection();
     }
   }
@@ -217,12 +217,12 @@ export default class Highlighter {
     return [document.createTextNode(text)];
   }
 
-  enable() {
-    this.enabled = true;
+  enableSelection() {
+    this.selectionEnabled = true;
   }
 
-  disable() {
-    this.enabled = false;
+  disableSelection() {
+    this.selectionEnabled = false;
   }
 }
 

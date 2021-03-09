@@ -4,6 +4,8 @@ import Mrkr from '../lib';
 const mrkr= new Mrkr();
 window.mrkr = mrkr;
 
+mrkr.enableSelection();
+
 // import React from 'react';
 // import ReactDOM from 'react-dom';
 // import App from './App';
