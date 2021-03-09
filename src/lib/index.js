@@ -1,2 +1,2 @@
-import App from './App';
+import App from './Mrkr';
 export default App;
