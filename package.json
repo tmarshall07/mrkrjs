@@ -1,7 +1,7 @@
 {
-  "name": "@hodgef/js-library-boilerplate",
-  "version": "2.5.27",
-  "description": "Javascript Starter Kit for building libraries",
+  "name": "mrkerjs",
+  "version": "1.0.0",
+  "description": "Text highlighting utility.",
   "main": "build/index.js",
   "scripts": {
     "start": "node scripts/start.js",
@@ -17,7 +17,7 @@
     "type": "git",
     "url": "https://github.com/hodgef/js-library-boilerplate"
   },
-  "author": "Francisco Hodge <hello@franciscohodge.com> (https://github.com/hodgef)",
+  "author": "Tanner Marshall <tannersmarshall@gmail.com> (https://github.com/tmarshall07)",
   "bugs": {
     "url": "https://github.com/hodgef/js-library-boilerplate/issues"
   },
