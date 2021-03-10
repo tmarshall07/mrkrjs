@@ -3,10 +3,16 @@ function isTextNode(node: Node): node is Text {
   return (node as Text).nodeType === 3;
 }
 
+type OffsetProps = {
+  startOffset?: number;
+  endOffset?: number;
+}
+
 interface Props {
   element?: HTMLElement;
   className?: string;
   selectionEnabled?: boolean;
+  onHighlightSelection?: (e: PointerEvent, offsets: OffsetProps) => void;
 }
 
 interface Range {
@@ -20,23 +26,32 @@ export default class Highlighter {
   element: HTMLElement;
   highlightClass: string;
   selectionEnabled: boolean;
+  onHighlightSelection: (e: PointerEvent, offsets: OffsetProps) => void;
 
   constructor(props: Props = {}) {
-    const { element = document.body, className = 'highlight', selectionEnabled = false } = props;
+    const { element = document.body, className = 'highlight', selectionEnabled = false, onHighlightSelection = () => {} } = props;
 
     this.element = element;
     this.highlightClass = className;
     this.selectionEnabled = selectionEnabled;
+    this.onHighlightSelection = onHighlightSelection;
 
     this.setContainerElement(element);
 
     this.handlePointerUp = this.handlePointerUp.bind(this);
+    this.register();
+  }
+
+  register() {
+    this.element.removeEventListener('pointerup', this.handlePointerUp);
     this.element.addEventListener('pointerup', this.handlePointerUp);
   }
 
-  handlePointerUp() {
+  handlePointerUp(event: PointerEvent) {
     if (this.selectionEnabled) {
-      this.highlightSelection();
+      const offsets = this.highlightSelection();
+
+      this.onHighlightSelection(event, offsets);
     }
   }
 

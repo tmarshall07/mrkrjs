@@ -1,7 +1,12 @@
 import './css/App.css';
 import Mrkr from '../lib';
 
-const mrkr= new Mrkr();
+const onHighlightSelection = (e, results) => {
+  console.log(e)
+  console.log(results)
+};
+
+const mrkr= new Mrkr({ onHighlightSelection });
 window.mrkr = mrkr;
 
 mrkr.enableSelection();
