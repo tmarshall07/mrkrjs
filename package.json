@@ -1,5 +1,5 @@
 {
-  "name": "mrkerjs",
+  "name": "mrkrjs",
   "version": "1.0.3",
   "description": "Text highlighting utility.",
   "main": "build/index.js",
