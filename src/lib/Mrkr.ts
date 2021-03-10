@@ -35,16 +35,24 @@ export default class Highlighter {
     this.highlightClass = className;
     this.selectionEnabled = selectionEnabled;
     this.onHighlightSelection = onHighlightSelection;
+    
+    this.handlePointerUp = this.handlePointerUp.bind(this);
 
     this.setContainerElement(element);
-
-    this.handlePointerUp = this.handlePointerUp.bind(this);
-    this.register();
   }
 
   register() {
-    this.element.removeEventListener('pointerup', this.handlePointerUp);
     this.element.addEventListener('pointerup', this.handlePointerUp);
+  }
+
+  unregister() {
+    this.element.removeEventListener('pointerup', this.handlePointerUp);
+  }
+  
+  setContainerElement(element: HTMLElement) {
+    this.unregister();
+    this.element = element;
+    this.register();
   }
 
   handlePointerUp(event: PointerEvent) {
@@ -53,10 +61,6 @@ export default class Highlighter {
 
       this.onHighlightSelection(event, offsets);
     }
-  }
-
-  setContainerElement(element: HTMLElement) {
-    this.element = element;
   }
 
   getHighlightedNodes(): HTMLElement[] {
