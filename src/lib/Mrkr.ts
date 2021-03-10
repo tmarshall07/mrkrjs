@@ -12,6 +12,11 @@ function isTextNode(node: Node): node is Text {
   return (node as Text).nodeType === 3;
 }
 
+// Type guard for offset
+function isValidOffset(offset?: OffsetProps): offset is { startOffset: number; endOffset: number } {
+  return !!(offset && typeof offset.startOffset === 'number' && typeof offset.endOffset === 'number');
+}
+
 interface Props {
   element?: HTMLElement;
   className?: string;
@@ -143,7 +148,7 @@ export default class Mrkr {
     if (!this.element) return;
 
     // Guard against bad offset inputs
-    const offsets = offsetTargets?.filter((o) => o && o.startOffset && o.endOffset);
+    const offsets = offsetTargets?.filter((o) => isValidOffset(o));
 
     const highlightedNodes = this.getHighlightedNodes();
     const textNodes = textNodesUnder(this.element);
@@ -159,7 +164,7 @@ export default class Mrkr {
 
       // Clear any text nodes that fall inside any of the offset ranges passed
       textNodes.some((textNode) => {
-        if (offsets.find((offset) => offset.startOffset && offset.endOffset && (currentIndex >= offset.startOffset && currentIndex <= offset.endOffset))) {
+        if (offsets.find((offset) => isValidOffset(offset) && (currentIndex >= offset.startOffset && currentIndex <= offset.endOffset))) {
           const highlightedNode = highlightedNodes.find((node) => !!Array.from(node.childNodes).find((n => n === textNode)));
           if (highlightedNode) {
             highlightedNode.replaceWith(...Array.from(highlightedNode.childNodes));
