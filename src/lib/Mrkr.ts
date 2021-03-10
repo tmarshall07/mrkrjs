@@ -1,12 +1,15 @@
+type OffsetProps ={
+  startOffset?: number;
+  endOffset?: number;
+}
+
+type DataProps = OffsetProps & {
+  text: string;
+}
+
 // Type guard for Text nodes
 function isTextNode(node: Node): node is Text {
   return (node as Text).nodeType === 3;
-}
-
-type DataProps = {
-  startOffset?: number;
-  endOffset?: number;
-  text: string;
 }
 
 interface Props {
@@ -98,7 +101,9 @@ export default class Mrkr {
     textNodes.some((textNode) => {
       if (!textNode.textContent) return false;
 
-      if (highlightedNodes.find((node) => node === textNode)) {
+      const highlightedNode = highlightedNodes.find((node) => node === textNode);
+
+      if (highlightedNode) {
         if (!startFound) {
           data.push({
             startOffset: currentIndex,
@@ -134,13 +139,43 @@ export default class Mrkr {
     this.register();
   }
 
-  clear(): void {
+  clear(offsetTargets?: OffsetProps[]): void {
     if (!this.element) return;
 
+    // Guard against bad offset inputs
+    const offsets = offsetTargets?.filter((o) => o && o.startOffset && o.endOffset);
+
     const highlightedNodes = this.getHighlightedNodes();
-    highlightedNodes.forEach((highlightedNode) => {
-      highlightedNode.replaceWith(...Array.from(highlightedNode.childNodes));
-    });
+    const textNodes = textNodesUnder(this.element);
+
+    // If offsets array not included, clear all
+    if (!offsets) {
+      highlightedNodes.forEach((highlightedNode) => {
+        highlightedNode.replaceWith(...Array.from(highlightedNode.childNodes));
+      });
+    } else {
+      // Clear all highlighted text that falls between the offsets in the passed offsets array
+      let currentIndex = 0;
+
+      // Clear any text nodes that fall inside any of the offset ranges passed
+      textNodes.some((textNode) => {
+        if (offsets.find((offset) => offset.startOffset && offset.endOffset && (currentIndex >= offset.startOffset && currentIndex <= offset.endOffset))) {
+          const highlightedNode = highlightedNodes.find((node) => !!Array.from(node.childNodes).find((n => n === textNode)));
+          if (highlightedNode) {
+            highlightedNode.replaceWith(...Array.from(highlightedNode.childNodes));
+          }
+        }
+
+        // Can stop searching
+        const ends = offsets.map((offset) => offset.endOffset).filter(n => typeof n === 'number') as number[];
+        if (currentIndex > Math.max(...ends)) {
+          return true;
+        }
+
+        currentIndex += textNode.textContent?.length || 0;
+        return false;
+      });
+    }
   }
 
   highlight(): DataProps[] {
