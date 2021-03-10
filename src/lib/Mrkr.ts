@@ -12,7 +12,7 @@ interface Props {
   element?: HTMLElement;
   className?: string;
   selectionEnabled?: boolean;
-  onHighlightSelection?: (e: PointerEvent, offsets: OffsetProps) => void;
+  onSelection?: (e: PointerEvent, offsets: OffsetProps) => void;
 }
 
 interface Range {
@@ -22,23 +22,38 @@ interface Range {
   endOffset: number;
 }
 
-export default class Highlighter {
+export default class Mrkr {
   element: HTMLElement;
   highlightClass: string;
-  selectionEnabled: boolean;
-  onHighlightSelection: (e: PointerEvent, offsets: OffsetProps) => void;
+  onSelection: (e: PointerEvent, offsets: OffsetProps) => void;
+  
+  private selectionEnabled: boolean;
 
   constructor(props: Props = {}) {
-    const { element = document.body, className = 'highlight', selectionEnabled = false, onHighlightSelection = () => {} } = props;
+    const { element = document.body, className = 'highlight', selectionEnabled = false, onSelection = () => {} } = props;
 
     this.element = element;
     this.highlightClass = className;
     this.selectionEnabled = selectionEnabled;
-    this.onHighlightSelection = onHighlightSelection;
+    this.onSelection = onSelection;
     
     this.handlePointerUp = this.handlePointerUp.bind(this);
 
-    this.setContainerElement(element);
+    this.setElement(element);
+  }
+
+  private handlePointerUp(event: PointerEvent) {
+    if (this.selectionEnabled) {
+      const offsets = this.highlight();
+
+      this.onSelection(event, offsets);
+    }
+  }
+
+  private getHighlightedNodes(): HTMLElement[] {
+    if (!this.element) return [];
+
+    return Array.from(this.element.querySelectorAll(`.${this.highlightClass}`));
   }
 
   register() {
@@ -49,31 +64,12 @@ export default class Highlighter {
     this.element.removeEventListener('pointerup', this.handlePointerUp);
   }
   
-  setContainerElement(element: HTMLElement) {
+  setElement(element: HTMLElement) {
     this.unregister();
     this.element = element;
     this.register();
   }
 
-  handlePointerUp(event: PointerEvent) {
-    if (this.selectionEnabled) {
-      const offsets = this.highlightSelection();
-
-      this.onHighlightSelection(event, offsets);
-    }
-  }
-
-  getHighlightedNodes(): HTMLElement[] {
-    if (!this.element) return [];
-
-    return Array.from(this.element.querySelectorAll(`.${this.highlightClass}`));
-  }
-
-  /**
-   * Clears the highlights from the container element
-   *
-   * @memberof Highlighter
-   */
   clear(): void {
     if (!this.element) return;
 
@@ -83,9 +79,12 @@ export default class Highlighter {
     });
   }
 
-  highlightSelection(): { startOffset?: number; endOffset?: number } {
+  highlight(): { startOffset?: number; endOffset?: number } {
     const selection = window.getSelection();
-    let results = {};
+    let results = {
+      startOffset: undefined,
+      endOffset: undefined,
+    };
 
     // If there's no selection object
     if (!selection) return results;
@@ -234,6 +233,14 @@ export default class Highlighter {
     }
     
     return [document.createTextNode(text)];
+  }
+
+  getSelectionEnabled() {
+    return this.selectionEnabled;
+  }
+
+  toggleSelection(isEnabled: boolean) {
+    this.selectionEnabled = isEnabled;
   }
 
   enableSelection() {

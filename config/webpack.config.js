@@ -228,7 +228,7 @@ module.exports = function (webpackEnv) {
       // It requires a trailing slash, or the file assets will get an incorrect path.
       // We inferred the "public path" (such as / or /my-project) from homepage.
       publicPath: paths.publicUrlOrPath,
-      library: "mrkrjs",
+      library: "Mrkr",
       libraryTarget: 'umd',
       umdNamedDefine: true,
       // Point sourcemap entries to original disk location (format as URL on Windows)
@@ -438,7 +438,7 @@ module.exports = function (webpackEnv) {
                       loaderMap: {
                         svg: {
                           ReactComponent:
-                            '@svgr/webpack?-svgo,+titleProp,+ref![path]',
+                          '@svgr/webpack?-svgo,+titleProp,+ref![path]',
                         },
                       },
                     },
