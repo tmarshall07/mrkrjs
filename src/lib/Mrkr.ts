@@ -8,6 +8,10 @@ type OffsetProps = {
   endOffset?: number;
 }
 
+type Results = OffsetProps & {
+  text: string;
+}
+
 interface Props {
   element?: HTMLElement;
   className?: string;
@@ -44,9 +48,9 @@ export default class Mrkr {
 
   private handlePointerUp(event: PointerEvent) {
     if (this.selectionEnabled) {
-      const offsets = this.highlight();
+      const results = this.highlight();
 
-      this.onSelection(event, offsets);
+      this.onSelection(event, results);
     }
   }
 
@@ -79,11 +83,12 @@ export default class Mrkr {
     });
   }
 
-  highlight(): { startOffset?: number; endOffset?: number } {
+  highlight(): Results {
     const selection = window.getSelection();
     let results = {
       startOffset: undefined,
       endOffset: undefined,
+      text: '',
     };
 
     // If there's no selection object
@@ -143,16 +148,28 @@ export default class Mrkr {
         });
       }
       selection.removeAllRanges();
+
+      const data = {
+        ...this.getOffsets(),
+        text: this.getText(),
+      }
   
-      return this.getOffsets();
+      return data;
     }
 
     return results;
   }
 
-  highlightRange(startOffset: number, endOffset: number): void {
+  highlightRange(startOffset: number, endOffset: number): Results {
+    let results = {
+      text: '',
+      startOffset: undefined,
+      endOffset: undefined,
+    }
+
     if (!this.element) {
       console.error(new Error('Container element not defined for highlighter.'))
+      return results;
     };
 
     const textNodes = textNodesUnder(this.element);
@@ -180,6 +197,10 @@ export default class Mrkr {
       currentIndex = newCurrentIndex;
       return false;
     });
+
+    const text = this.getText();
+
+    return { text, startOffset, endOffset }
   }
 
   getOffsets() {
@@ -207,6 +228,15 @@ export default class Mrkr {
     });
 
     return { startOffset, endOffset };
+  }
+
+  getText(): string {
+    const offsets = this.getOffsets();
+    if (this.element.textContent && offsets.startOffset && offsets.endOffset) {
+      return this.element.textContent.substring(offsets.startOffset, offsets.endOffset);
+    };
+    
+    return '';
   }
 
   highlightNode (text: string | null = '', startOffset: number, endOffset: number): ChildNode[] {
