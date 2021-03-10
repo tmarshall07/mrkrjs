@@ -6,7 +6,9 @@ const onSelection = (e, results) => {
   console.log(results)
 };
 
-const mrkr= new Mrkr({ onSelection });
+const element = document.getElementById('root');
+
+const mrkr= new Mrkr({ onSelection, element });
 window.mrkr = mrkr;
 
 mrkr.enableSelection();

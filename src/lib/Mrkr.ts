@@ -90,7 +90,7 @@ export default class Mrkr {
     if (!this.element) return [];
 
     const textNodes = textNodesUnder(this.element);
-    const highlightedNodes = this.getHighlightedNodes().reduce((arr: Text[], current) => [...arr,  ...textNodesUnder(current)], []);
+    const highlightedTextNodes = this.getHighlightedNodes().reduce((arr: Text[], current) => [...arr,  ...textNodesUnder(current)], []);
 
     let currentIndex = 0;
 
@@ -101,9 +101,9 @@ export default class Mrkr {
     textNodes.some((textNode) => {
       if (!textNode.textContent) return false;
 
-      const highlightedNode = highlightedNodes.find((node) => node === textNode);
+      const highlightedTextNode = highlightedTextNodes.find((node) => node === textNode);
 
-      if (highlightedNode) {
+      if (highlightedTextNode) {
         if (!startFound) {
           data.push({
             startOffset: currentIndex,
@@ -115,7 +115,7 @@ export default class Mrkr {
           data[data.length - 1].text += textNode.textContent;
         }
       } else if (startFound) {
-        data[data.length - 1].endOffset = currentIndex + textNode.textContent.length;
+        data[data.length - 1].endOffset = currentIndex;
         startFound = false;
       }
 
