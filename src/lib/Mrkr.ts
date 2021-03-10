@@ -3,12 +3,9 @@ function isTextNode(node: Node): node is Text {
   return (node as Text).nodeType === 3;
 }
 
-type OffsetProps = {
+type DataProps = {
   startOffset?: number;
   endOffset?: number;
-}
-
-type Results = OffsetProps & {
   text: string;
 }
 
@@ -16,7 +13,7 @@ interface Props {
   element?: HTMLElement;
   className?: string;
   selectionEnabled?: boolean;
-  onSelection?: (e: PointerEvent, offsets: OffsetProps) => void;
+  onSelection?: (e: PointerEvent, data: DataProps[]) => void;
 }
 
 interface Range {
@@ -29,7 +26,7 @@ interface Range {
 export default class Mrkr {
   element: HTMLElement;
   highlightClass: string;
-  onSelection: (e: PointerEvent, offsets: OffsetProps) => void;
+  onSelection: (e: PointerEvent, data: DataProps[]) => void;
   
   private selectionEnabled: boolean;
 
@@ -60,6 +57,69 @@ export default class Mrkr {
     return Array.from(this.element.querySelectorAll(`.${this.highlightClass}`));
   }
 
+  private highlightNode (text: string | null = '', startOffset: number, endOffset: number): ChildNode[] {
+    if (!text) return [];
+
+    const highlightedText = text.substring(startOffset, endOffset);
+  
+    if (highlightedText.length > 0) {
+      const highlightedSpanNode = document.createElement('SPAN');
+      highlightedSpanNode.classList.add(this.highlightClass);
+    
+      const startTextNode = document.createTextNode(text.substring(0, startOffset));
+      const highlightedTextNode = document.createTextNode(highlightedText);
+      const endTextNode = document.createTextNode(text.substring(endOffset));
+    
+      highlightedSpanNode.appendChild(highlightedTextNode);
+    
+      const newNodes = [];
+      if (startTextNode.textContent) newNodes.push(startTextNode);
+      newNodes.push(highlightedSpanNode);
+      if (endTextNode.textContent) newNodes.push(endTextNode);
+    
+      return newNodes;
+    }
+    
+    return [document.createTextNode(text)];
+  }
+
+  getData(): DataProps[] {
+    if (!this.element) return [];
+
+    const textNodes = textNodesUnder(this.element);
+    const highlightedNodes = this.getHighlightedNodes().reduce((arr: Text[], current) => [...arr,  ...textNodesUnder(current)], []);
+
+    let currentIndex = 0;
+
+    let startFound = false;
+
+    const data: DataProps[] = [];
+    
+    textNodes.some((textNode) => {
+      if (!textNode.textContent) return false;
+
+      if (highlightedNodes.find((node) => node === textNode)) {
+        if (!startFound) {
+          data.push({
+            startOffset: currentIndex,
+            text: textNode.textContent,
+          });
+
+          startFound = true;
+        } else {
+          data[data.length - 1].text += textNode.textContent;
+        }
+      } else if (startFound) {
+        data[data.length - 1].endOffset = currentIndex + textNode.textContent.length;
+        startFound = false;
+      }
+
+      currentIndex += textNode.textContent.length;
+    });
+
+    return data;
+  }
+
   register() {
     this.element.addEventListener('pointerup', this.handlePointerUp);
   }
@@ -83,13 +143,9 @@ export default class Mrkr {
     });
   }
 
-  highlight(): Results {
+  highlight(): DataProps[] {
     const selection = window.getSelection();
-    let results = {
-      startOffset: undefined,
-      endOffset: undefined,
-      text: '',
-    };
+    let results: DataProps[] = [];
 
     // If there's no selection object
     if (!selection) return results;
@@ -149,23 +205,14 @@ export default class Mrkr {
       }
       selection.removeAllRanges();
 
-      const data = {
-        ...this.getOffsets(),
-        text: this.getText(),
-      }
-  
-      return data;
+      return this.getData();
     }
 
     return results;
   }
 
-  highlightRange(startOffset: number, endOffset: number): Results {
-    let results = {
-      text: '',
-      startOffset: undefined,
-      endOffset: undefined,
-    }
+  highlightRange(startOffset: number, endOffset: number): DataProps[] {
+    let results: DataProps[] = []
 
     if (!this.element) {
       console.error(new Error('Container element not defined for highlighter.'))
@@ -198,71 +245,7 @@ export default class Mrkr {
       return false;
     });
 
-    const text = this.getText();
-
-    return { text, startOffset, endOffset }
-  }
-
-  getOffsets() {
-    if (!this.element) return {};
-
-    const textNodes = textNodesUnder(this.element);
-    const highlightedNodes = this.getHighlightedNodes().reduce((arr: Text[], current) => [...arr,  ...textNodesUnder(current)], []);
-
-    let startOffset = 0;
-    let endOffset = 0;
-
-    let currentIndex = 0;
-    textNodes.some((textNode) => {
-      if (!textNode.textContent) return false;
-
-      if (highlightedNodes.find((node) => node === textNode)) {
-        if (!startOffset) {
-          startOffset = currentIndex;
-        }
-        
-        endOffset = currentIndex + textNode.textContent.length;
-      }
-
-      currentIndex += textNode.textContent.length;
-    });
-
-    return { startOffset, endOffset };
-  }
-
-  getText(): string {
-    const offsets = this.getOffsets();
-    if (this.element.textContent && offsets.startOffset && offsets.endOffset) {
-      return this.element.textContent.substring(offsets.startOffset, offsets.endOffset);
-    };
-    
-    return '';
-  }
-
-  highlightNode (text: string | null = '', startOffset: number, endOffset: number): ChildNode[] {
-    if (!text) return [];
-
-    const highlightedText = text.substring(startOffset, endOffset);
-  
-    if (highlightedText.length > 0) {
-      const highlightedSpanNode = document.createElement('SPAN');
-      highlightedSpanNode.classList.add(this.highlightClass);
-    
-      const startTextNode = document.createTextNode(text.substring(0, startOffset));
-      const highlightedTextNode = document.createTextNode(highlightedText);
-      const endTextNode = document.createTextNode(text.substring(endOffset));
-    
-      highlightedSpanNode.appendChild(highlightedTextNode);
-    
-      const newNodes = [];
-      if (startTextNode.textContent) newNodes.push(startTextNode);
-      newNodes.push(highlightedSpanNode);
-      if (endTextNode.textContent) newNodes.push(endTextNode);
-    
-      return newNodes;
-    }
-    
-    return [document.createTextNode(text)];
+    return this.getData();
   }
 
   getSelectionEnabled() {
