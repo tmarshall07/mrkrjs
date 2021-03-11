@@ -117,12 +117,13 @@ export default class Mrkr {
 
           startFound = true;
 
-          // If this node is also the last node
-          if (i === textNodes.length - 1) {
-            data[data.length - 1].endOffset = currentIndex + textNode.textContent.length;
-          }
         } else {
           data[data.length - 1].text += textNode.textContent;
+        }
+
+        // If this node is also the last node
+        if (i === textNodes.length - 1) {
+          data[data.length - 1].endOffset = currentIndex + textNode.textContent.length;
         }
       } else if (startFound) {
         data[data.length - 1].endOffset = currentIndex;
