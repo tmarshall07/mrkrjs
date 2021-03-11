@@ -103,7 +103,7 @@ export default class Mrkr {
 
     const data: DataProps[] = [];
     
-    textNodes.some((textNode) => {
+    textNodes.some((textNode, i) => {
       if (!textNode.textContent) return false;
 
       const highlightedTextNode = highlightedTextNodes.find((node) => node === textNode);
@@ -116,6 +116,11 @@ export default class Mrkr {
           });
 
           startFound = true;
+
+          // If this node is also the last node
+          if (i === textNodes.length - 1) {
+            data[data.length - 1].endOffset = currentIndex + textNode.textContent.length;
+          }
         } else {
           data[data.length - 1].text += textNode.textContent;
         }
