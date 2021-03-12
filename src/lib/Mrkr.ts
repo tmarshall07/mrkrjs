@@ -5,6 +5,7 @@ type OffsetProps ={
 
 type DataProps = OffsetProps & {
   text: string;
+  nodes: Text[];
 }
 
 // Type guard for Text nodes
@@ -73,10 +74,10 @@ export default class Mrkr {
    * @returns {HTMLElement[]}
    * @memberof Mrkr
    */
-  private getHighlightedNodes(): HTMLElement[] {
+  private getHighlightedNodes(className?: string): HTMLElement[] {
     if (!this.element) return [];
 
-    return Array.from(this.element.querySelectorAll(`.${this.highlightClass}`));
+    return Array.from(this.element.querySelectorAll(`.${className || this.highlightClass}`));
   }
 
   /**
@@ -153,15 +154,16 @@ export default class Mrkr {
   /**
    * Searches the container element for any highlighted nodes
    * according to the current className
-   *
+   * 
+   * @param {string} [className] - optional classname, otherwise will check for this.highlightClass
    * @returns {DataProps[]}
    * @memberof Mrkr
    */
-  getData(): DataProps[] {
+  getData(className?: string): DataProps[] {
     if (!this.element) return [];
 
     const textNodes = textNodesUnder(this.element);
-    const highlightedTextNodes = this.getHighlightedNodes().reduce((arr: Text[], current) => [...arr,  ...textNodesUnder(current)], []);
+    const highlightedTextNodes = this.getHighlightedNodes(className).reduce((arr: Text[], current) => [...arr,  ...textNodesUnder(current)], []);
 
     let currentIndex = 0;
 
@@ -179,12 +181,14 @@ export default class Mrkr {
           data.push({
             startOffset: currentIndex,
             text: textNode.textContent,
+            nodes: [highlightedTextNode],
           });
 
           startFound = true;
 
         } else {
           data[data.length - 1].text += textNode.textContent;
+          data[data.length - 1].nodes.push(highlightedTextNode);
         }
 
         // If this node is also the last node
