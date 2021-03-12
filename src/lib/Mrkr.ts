@@ -234,7 +234,9 @@ export default class Mrkr {
             startFound = true;
             
             return false;
-          } else if (textNode === endTextNode) {
+          }
+          
+          if (textNode === endTextNode) {
             // Handle highlighting the end text node
             const newEndNodes = this.highlightNode(textNode.textContent, 0, endOffset);
             textNode.replaceWith(...newEndNodes);
@@ -258,7 +260,7 @@ export default class Mrkr {
   }
 
   highlightRange(startOffset: number, endOffset: number): DataProps[] {
-    let results: DataProps[] = []
+    let results: DataProps[] = [];
 
     if (!this.element) {
       console.error(new Error('Container element not defined for highlighter.'))
@@ -273,14 +275,21 @@ export default class Mrkr {
     textNodes.some((textNode) => {
       if (!textNode.textContent) return false;
 
-      const newCurrentIndex = currentIndex + (textNode.textContent.length || 0);
+      const newCurrentIndex = currentIndex + textNode.textContent.length;
       if (startOffset >= currentIndex && startOffset < newCurrentIndex) {
-        const newNodes = this.highlightNode(textNode.textContent, startOffset - currentIndex, textNode.textContent.length);
+        const newNodes = this.highlightNode(textNode.textContent, startOffset - currentIndex, endOffset - currentIndex);
         textNode.replaceWith(...newNodes);
+  
+        // Start collecting text nodes in between
         startFound = true;
-      } else if (endOffset >= currentIndex && endOffset < newCurrentIndex) {
+      }
+      
+      if (endOffset >= currentIndex && endOffset < newCurrentIndex) {
         const newNodes = this.highlightNode(textNode.textContent, 0, endOffset - currentIndex);
+        
         textNode.replaceWith(...newNodes);
+        
+        // End the loop
         return true;
       } else if (startFound) {
         const newNodes = this.highlightNode(textNode.textContent, 0, textNode.textContent.length);
