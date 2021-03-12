@@ -91,6 +91,35 @@ export default class Mrkr {
     return [document.createTextNode(text)];
   }
 
+  private getAbsoluteOffsets = (startContainer: Text, startOffset: number, endContainer: Text, endOffset: number): OffsetProps => {
+    const textNodes = textNodesUnder(this.element);
+    let currentIndex = 0;
+    let absoluteStartOffset = undefined;
+    let absoluteEndOffset  = undefined;
+
+    textNodes.some((textNode) => {
+      if (!textNode?.textContent) return false;
+      
+      if (textNode === startContainer) {
+        absoluteStartOffset = currentIndex + startOffset;
+      }
+
+      if (textNode === endContainer) {
+        absoluteEndOffset = currentIndex + endOffset;
+        return true;
+      }
+
+      currentIndex = currentIndex + textNode.textContent.length;
+      return false;
+    });
+
+    if (absoluteStartOffset && absoluteEndOffset) {
+      return { startOffset: absoluteStartOffset, endOffset: absoluteEndOffset };
+    }
+
+    return {};
+  }
+
   getData(): DataProps[] {
     if (!this.element) return [];
 
@@ -204,53 +233,23 @@ export default class Mrkr {
     
     const range = selection.getRangeAt(0);
     
-    const { startContainer, endContainer, startOffset, endOffset } = range as unknown as Range;
-
+    const { startContainer, endContainer } = range as unknown as Range;
+    
     // Ensure that results are Text nodes
     if (isTextNode(startContainer) && isTextNode(endContainer)) {
       const startTextNode = startContainer;
       const endTextNode = endContainer;
 
       // If no content's actually been selected
-      if (startTextNode === endTextNode && endOffset === startOffset) return results;
-  
-      if (startTextNode === endTextNode) {
-        // If the selection occurs inside the same text node
-        const newNodes = this.highlightNode(startTextNode.textContent, startOffset, endOffset) as ChildNode[];
-        startTextNode.replaceWith(...newNodes);
-      } else {
-        const textNodes = textNodesUnder(this.element);
-  
-        let startFound = false;
-        textNodes.some((textNode) => {
-          if (!textNode.textContent) return false;
-  
-          // Handle highlighting the starting text node
-          if (textNode === startTextNode) {
-            const newStartNodes = this.highlightNode(textNode.textContent, startOffset, textNode.textContent.length);
-            textNode.replaceWith(...newStartNodes);
-  
-            // Start collecting text nodes in between
-            startFound = true;
-            
-            return false;
-          }
-          
-          if (textNode === endTextNode) {
-            // Handle highlighting the end text node
-            const newEndNodes = this.highlightNode(textNode.textContent, 0, endOffset);
-            textNode.replaceWith(...newEndNodes);
-  
-            return true; // Stop the loop
-          } else if (startFound) {
-            // Handle highlighting nodes in between start and end
-            const newEndNodes = this.highlightNode(textNode.textContent, 0, textNode.textContent.length);
-            textNode.replaceWith(...newEndNodes);
-          }
-          
-          return false;
-        });
+      if (startTextNode === endTextNode && range.endOffset === range.startOffset) return results;
+
+      // Convert to absolute offsets in the element
+      const offsets = this.getAbsoluteOffsets(startContainer, range.startOffset, endContainer, range.endOffset);
+
+      if (isValidOffset(offsets)) {
+        this.highlightRange(offsets.startOffset, offsets.endOffset);
       }
+
       selection.removeAllRanges();
 
       return this.getData();
@@ -271,6 +270,7 @@ export default class Mrkr {
     
     let currentIndex = 0;
     let startFound = false;
+    let text = '';
 
     textNodes.some((textNode) => {
       if (!textNode.textContent) return false;
