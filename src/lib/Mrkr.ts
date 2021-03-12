@@ -51,6 +51,13 @@ export default class Mrkr {
     this.setElement(element);
   }
 
+  /**
+   * Callback run on pointerup
+   *
+   * @private
+   * @param {PointerEvent} event
+   * @memberof Mrkr
+   */
   private handlePointerUp(event: PointerEvent) {
     if (this.selectionEnabled) {
       const results = this.highlight();
@@ -59,12 +66,29 @@ export default class Mrkr {
     }
   }
 
+  /**
+   * Gets all nodes that have the current className
+   *
+   * @private
+   * @returns {HTMLElement[]}
+   * @memberof Mrkr
+   */
   private getHighlightedNodes(): HTMLElement[] {
     if (!this.element) return [];
 
     return Array.from(this.element.querySelectorAll(`.${this.highlightClass}`));
   }
 
+  /**
+   * Creates a set of highlighted and non-highlighted nodes to replace the passed text content
+   *
+   * @private
+   * @param {(string | null)} [text='']
+   * @param {number} startOffset
+   * @param {number} endOffset
+   * @returns {ChildNode[]}
+   * @memberof Mrkr
+   */
   private highlightNode (text: string | null = '', startOffset: number, endOffset: number): ChildNode[] {
     if (!text) return [];
 
@@ -91,6 +115,12 @@ export default class Mrkr {
     return [document.createTextNode(text)];
   }
 
+  /**
+   * Converts relative range offset data to absolute offsets
+   *
+   * @private
+   * @memberof Mrkr
+   */
   private getAbsoluteOffsets = (startContainer: Text, startOffset: number, endContainer: Text, endOffset: number): OffsetProps => {
     const textNodes = textNodesUnder(this.element);
     let currentIndex = 0;
@@ -120,6 +150,13 @@ export default class Mrkr {
     return {};
   }
 
+  /**
+   * Searches the container element for any highlighted nodes
+   * according to the current className
+   *
+   * @returns {DataProps[]}
+   * @memberof Mrkr
+   */
   getData(): DataProps[] {
     if (!this.element) return [];
 
@@ -165,20 +202,43 @@ export default class Mrkr {
     return data;
   }
 
+  /**
+   * Adds the event listener for pointerup
+   *
+   * @memberof Mrkr
+   */
   register() {
     this.element.addEventListener('pointerup', this.handlePointerUp);
   }
 
+  /**
+   * Removes the event listener for pointerup
+   *
+   * @memberof Mrkr
+   */
   unregister() {
     this.element.removeEventListener('pointerup', this.handlePointerUp);
   }
   
+  /**
+   * Sets the current container element
+   *
+   * @param {HTMLElement} element
+   * @memberof Mrkr
+   */
   setElement(element: HTMLElement) {
     this.unregister();
     this.element = element;
     this.register();
   }
 
+  /**
+   * Clears all or part of the highlighted text blocks
+   *
+   * @param {OffsetProps[]} [offsetTargets] - optional array of offsets to target and remove
+   * @returns {void}
+   * @memberof Mrkr
+   */
   clear(offsetTargets?: OffsetProps[]): void {
     if (!this.element) return;
 
@@ -258,6 +318,14 @@ export default class Mrkr {
     return results;
   }
 
+  /**
+   * Highlights a range of text determined by start and end offsets
+   *
+   * @param {number} startOffset - absolute offset in the element container
+   * @param {number} endOffset - absolute offset in the element container
+   * @returns {DataProps[]}
+   * @memberof Mrkr
+   */
   highlightRange(startOffset: number, endOffset: number): DataProps[] {
     let results: DataProps[] = [];
 
@@ -270,7 +338,6 @@ export default class Mrkr {
     
     let currentIndex = 0;
     let startFound = false;
-    let text = '';
 
     textNodes.some((textNode) => {
       if (!textNode.textContent) return false;
@@ -286,7 +353,6 @@ export default class Mrkr {
       
       if (endOffset >= currentIndex && endOffset < newCurrentIndex) {
         const newNodes = this.highlightNode(textNode.textContent, 0, endOffset - currentIndex);
-        
         textNode.replaceWith(...newNodes);
         
         // End the loop
