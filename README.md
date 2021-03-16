@@ -31,6 +31,7 @@ const mrkr = new Mrkr(options); // Create mrkr instance
 // Enable selection highlight
 mrkr.enableSelection();
 ```
+> Note: MrkrJS *does not* apply any default styling to the highlighted elements, so remember to add styles for your passed `className` or the default `.highlight` class.
 
 ## Options
 ### `element: HTMLELement`
@@ -82,6 +83,11 @@ Clears a specific range of highlighted text if an array is passed, otherwise cle
   endOffset: number;
 }[]
 ```
+
+### `setClassName(className)`
+Sets the current `className` applied to highlighted text.
+#### parameters
+`className`: `string`
 
 ### `getData()`
 Gets an array of data about the highlighted blocks of text.

@@ -212,6 +212,16 @@ export default class Mrkr {
   }
 
   /**
+   * Sets the current classname
+   *
+   * @param {string} className
+   * @memberof Mrkr
+   */
+  setClassName(className: string): void {
+    this.highlightClass = className;
+  }
+
+  /**
    * Searches the container element for any highlighted nodes
    * according to the current className
    *
@@ -453,19 +463,19 @@ export default class Mrkr {
     return this.getData();
   }
 
-  getSelectionEnabled() {
+  getSelectionEnabled(): boolean {
     return this.selectionEnabled;
   }
 
-  toggleSelection(isEnabled: boolean) {
+  toggleSelection(isEnabled: boolean): void {
     this.selectionEnabled = typeof isEnabled === 'undefined' ? !this.selectionEnabled : isEnabled;
   }
 
-  enableSelection() {
+  enableSelection(): void {
     this.selectionEnabled = true;
   }
 
-  disableSelection() {
+  disableSelection(): void {
     this.selectionEnabled = false;
   }
 }
