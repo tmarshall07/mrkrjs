@@ -1,12 +1,12 @@
-type OffsetProps ={
+type OffsetProps = {
   startOffset?: number;
   endOffset?: number;
-}
+};
 
 type DataProps = OffsetProps & {
   text: string;
   nodes: Text[];
-}
+};
 
 // Type guard for Text nodes
 function isTextNode(node: Node): node is Text {
@@ -18,10 +18,30 @@ function isValidOffset(offset?: OffsetProps): offset is { startOffset: number; e
   return !!(offset && typeof offset.startOffset === 'number' && typeof offset.endOffset === 'number');
 }
 
+/**
+ * Gets an array of text nodes under the passed node
+ *
+ * @param {HTMLElement} node
+ * @returns {[HTMLElement]} - array of text nodes
+ */
+const textNodesUnder = (node: any): Text[] => {
+  let all: Text[] = [];
+
+  // eslint-disable-next-line no-param-reassign
+  for (node = node.firstChild; node; node = node.nextSibling) {
+    if (isTextNode(node)) all.push(node);
+    else all = all.concat(textNodesUnder(node));
+  }
+  return all;
+};
+
 interface Props {
   element?: HTMLElement;
   className?: string;
   selectionEnabled?: boolean;
+  minimum?: number;
+  maximum?: number;
+  overlap?: boolean;
   onSelection?: (e: PointerEvent, data: DataProps[]) => void;
 }
 
@@ -34,19 +54,38 @@ interface Range {
 
 export default class Mrkr {
   element: HTMLElement;
+
   highlightClass: string;
-  onSelection: (e: PointerEvent, data: DataProps[]) => void;
-  
+
+  maximum?: number;
+
+  minimum?: number;
+
+  overlap?: boolean;
+
+  onSelection?: (e: PointerEvent, data: DataProps[]) => void;
+
   private selectionEnabled: boolean;
 
   constructor(props: Props = {}) {
-    const { element = document.body, className = 'highlight', selectionEnabled = false, onSelection = () => {} } = props;
+    const {
+      element = document.body,
+      className = 'highlight',
+      selectionEnabled = false,
+      onSelection,
+      maximum = undefined,
+      minimum = undefined,
+      overlap = true,
+    } = props;
 
     this.element = element;
     this.highlightClass = className;
     this.selectionEnabled = selectionEnabled;
+    this.maximum = maximum;
+    this.minimum = minimum;
+    this.overlap = overlap;
     this.onSelection = onSelection;
-    
+
     this.handlePointerUp = this.handlePointerUp.bind(this);
 
     this.setElement(element);
@@ -63,7 +102,7 @@ export default class Mrkr {
     if (this.selectionEnabled) {
       const results = this.highlight();
 
-      this.onSelection(event, results);
+      if (this.onSelection) this.onSelection(event, results);
     }
   }
 
@@ -90,29 +129,29 @@ export default class Mrkr {
    * @returns {ChildNode[]}
    * @memberof Mrkr
    */
-  private highlightNode (text: string | null = '', startOffset: number, endOffset: number): ChildNode[] {
+  private highlightNode(text: string | null = '', startOffset: number, endOffset: number): ChildNode[] {
     if (!text) return [];
 
     const highlightedText = text.substring(startOffset, endOffset);
-  
+
     if (highlightedText.length > 0) {
       const highlightedSpanNode = document.createElement('SPAN');
       highlightedSpanNode.classList.add(this.highlightClass);
-    
+
       const startTextNode = document.createTextNode(text.substring(0, startOffset));
       const highlightedTextNode = document.createTextNode(highlightedText);
       const endTextNode = document.createTextNode(text.substring(endOffset));
-    
+
       highlightedSpanNode.appendChild(highlightedTextNode);
-    
+
       const newNodes = [];
       if (startTextNode.textContent) newNodes.push(startTextNode);
       newNodes.push(highlightedSpanNode);
       if (endTextNode.textContent) newNodes.push(endTextNode);
-    
+
       return newNodes;
     }
-    
+
     return [document.createTextNode(text)];
   }
 
@@ -122,15 +161,20 @@ export default class Mrkr {
    * @private
    * @memberof Mrkr
    */
-  private getAbsoluteOffsets = (startContainer: Text, startOffset: number, endContainer: Text, endOffset: number): OffsetProps => {
+  private getAbsoluteOffsets = (
+    startContainer: Text,
+    startOffset: number,
+    endContainer: Text,
+    endOffset: number,
+  ): OffsetProps => {
     const textNodes = textNodesUnder(this.element);
     let currentIndex = 0;
-    let absoluteStartOffset = undefined;
-    let absoluteEndOffset  = undefined;
+    let absoluteStartOffset;
+    let absoluteEndOffset;
 
     textNodes.some((textNode) => {
       if (!textNode?.textContent) return false;
-      
+
       if (textNode === startContainer) {
         absoluteStartOffset = currentIndex + startOffset;
       }
@@ -140,7 +184,7 @@ export default class Mrkr {
         return true;
       }
 
-      currentIndex = currentIndex + textNode.textContent.length;
+      currentIndex += textNode.textContent.length;
       return false;
     });
 
@@ -149,12 +193,12 @@ export default class Mrkr {
     }
 
     return {};
-  }
+  };
 
   /**
    * Searches the container element for any highlighted nodes
    * according to the current className
-   * 
+   *
    * @param {string} [className] - optional classname, otherwise will check for this.highlightClass
    * @returns {DataProps[]}
    * @memberof Mrkr
@@ -163,14 +207,17 @@ export default class Mrkr {
     if (!this.element) return [];
 
     const textNodes = textNodesUnder(this.element);
-    const highlightedTextNodes = this.getHighlightedNodes(className).reduce((arr: Text[], current) => [...arr,  ...textNodesUnder(current)], []);
+    const highlightedTextNodes = this.getHighlightedNodes(className).reduce(
+      (arr: Text[], current) => [...arr, ...textNodesUnder(current)],
+      [],
+    );
 
     let currentIndex = 0;
 
     let startFound = false;
 
     const data: DataProps[] = [];
-    
+
     textNodes.some((textNode, i) => {
       if (!textNode.textContent) return false;
 
@@ -185,7 +232,6 @@ export default class Mrkr {
           });
 
           startFound = true;
-
         } else {
           data[data.length - 1].text += textNode.textContent;
           data[data.length - 1].nodes.push(highlightedTextNode);
@@ -201,6 +247,8 @@ export default class Mrkr {
       }
 
       currentIndex += textNode.textContent.length;
+
+      return false;
     });
 
     return data;
@@ -211,7 +259,7 @@ export default class Mrkr {
    *
    * @memberof Mrkr
    */
-  register() {
+  register(): void {
     this.element.addEventListener('pointerup', this.handlePointerUp);
   }
 
@@ -220,17 +268,17 @@ export default class Mrkr {
    *
    * @memberof Mrkr
    */
-  unregister() {
+  unregister(): void {
     this.element.removeEventListener('pointerup', this.handlePointerUp);
   }
-  
+
   /**
    * Sets the current container element
    *
    * @param {HTMLElement} element
    * @memberof Mrkr
    */
-  setElement(element: HTMLElement) {
+  setElement(element: HTMLElement): void {
     this.unregister();
     this.element = element;
     this.register();
@@ -263,15 +311,21 @@ export default class Mrkr {
 
       // Clear any text nodes that fall inside any of the offset ranges passed
       textNodes.some((textNode) => {
-        if (offsets.find((offset) => isValidOffset(offset) && (currentIndex >= offset.startOffset && currentIndex <= offset.endOffset))) {
-          const highlightedNode = highlightedNodes.find((node) => !!Array.from(node.childNodes).find((n => n === textNode)));
+        if (
+          offsets.find(
+            (offset) => isValidOffset(offset) && currentIndex >= offset.startOffset && currentIndex <= offset.endOffset,
+          )
+        ) {
+          const highlightedNode = highlightedNodes.find(
+            (node) => !!Array.from(node.childNodes).find((n) => n === textNode),
+          );
           if (highlightedNode) {
             highlightedNode.replaceWith(...Array.from(highlightedNode.childNodes));
           }
         }
 
         // Can stop searching
-        const ends = offsets.map((offset) => offset.endOffset).filter(n => typeof n === 'number') as number[];
+        const ends = offsets.map((offset) => offset.endOffset).filter((n) => typeof n === 'number') as number[];
         if (currentIndex > Math.max(...ends)) {
           return true;
         }
@@ -284,7 +338,7 @@ export default class Mrkr {
 
   highlight(): DataProps[] {
     const selection = window.getSelection();
-    let results: DataProps[] = [];
+    const results: DataProps[] = [];
 
     // If there's no selection object
     if (!selection) return results;
@@ -293,12 +347,12 @@ export default class Mrkr {
     if (!this.element) {
       console.error(new Error('Container element not defined for highlighter.'));
       return results;
-    } 
-    
+    }
+
     const range = selection.getRangeAt(0);
-    
-    const { startContainer, endContainer } = range as unknown as Range;
-    
+
+    const { startContainer, endContainer } = (range as unknown) as Range;
+
     // Ensure that results are Text nodes
     if (isTextNode(startContainer) && isTextNode(endContainer)) {
       const startTextNode = startContainer;
@@ -310,11 +364,38 @@ export default class Mrkr {
       // Convert to absolute offsets in the element
       const offsets = this.getAbsoluteOffsets(startContainer, range.startOffset, endContainer, range.endOffset);
 
+      // Remove native selection
+      selection.removeAllRanges();
+
+      if (offsets.startOffset && offsets.endOffset) {
+        const length = offsets.endOffset - offsets.startOffset;
+
+        // Check for minimum / maximum
+        const { startOffset, endOffset } = offsets;
+        if ((this.minimum && !(length >= this.minimum)) || (this.maximum && !(length <= this.maximum))) {
+          return results;
+        }
+
+        // Check for overlap
+        if (!this.overlap) {
+          const highlights = this.getData();
+          if (
+            highlights.some(
+              (highlight) =>
+                highlight.startOffset &&
+                highlight.endOffset &&
+                ((startOffset > highlight.startOffset && startOffset < highlight.endOffset) ||
+                  (endOffset > highlight.startOffset && endOffset < highlight.endOffset)),
+            )
+          ) {
+            return results;
+          }
+        }
+      }
+
       if (isValidOffset(offsets)) {
         this.highlightRange(offsets.startOffset, offsets.endOffset);
       }
-
-      selection.removeAllRanges();
 
       return this.getData();
     }
@@ -331,15 +412,15 @@ export default class Mrkr {
    * @memberof Mrkr
    */
   highlightRange(startOffset: number, endOffset: number): DataProps[] {
-    let results: DataProps[] = [];
+    const results: DataProps[] = [];
 
     if (!this.element) {
-      console.error(new Error('Container element not defined for highlighter.'))
+      console.error(new Error('Container element not defined for highlighter.'));
       return results;
-    };
+    }
 
     const textNodes = textNodesUnder(this.element);
-    
+
     let currentIndex = 0;
     let startFound = false;
 
@@ -350,18 +431,19 @@ export default class Mrkr {
       if (startOffset >= currentIndex && startOffset < newCurrentIndex) {
         const newNodes = this.highlightNode(textNode.textContent, startOffset - currentIndex, endOffset - currentIndex);
         textNode.replaceWith(...newNodes);
-  
+
         // Start collecting text nodes in between
         startFound = true;
       }
-      
+
       if (endOffset >= currentIndex && endOffset < newCurrentIndex) {
         const newNodes = this.highlightNode(textNode.textContent, 0, endOffset - currentIndex);
         textNode.replaceWith(...newNodes);
-        
+
         // End the loop
         return true;
-      } else if (startFound) {
+      }
+      if (startFound) {
         const newNodes = this.highlightNode(textNode.textContent, 0, textNode.textContent.length);
         textNode.replaceWith(...newNodes);
       }
@@ -389,20 +471,3 @@ export default class Mrkr {
     this.selectionEnabled = false;
   }
 }
-
-/**
- * Gets an array of text nodes under the passed node
- *
- * @param {HTMLElement} node
- * @returns {[HTMLElement]} - array of text nodes
- */
- const textNodesUnder = (node: HTMLElement): Text[] => {
-  let all: Text[] = [];
-
-  // @ts-ignore
-  for (node = node.firstChild; node; node = node.nextSibling) {
-    if (isTextNode(node)) all.push(node);
-    else all = all.concat(textNodesUnder(node));
-  }
-  return all;
-};
