@@ -38,7 +38,6 @@ const textNodesUnder = (node: any): Text[] => {
 interface Props {
   element?: HTMLElement;
   className?: string;
-  selectionEnabled?: boolean;
   minimum?: number;
   maximum?: number;
   overlap?: boolean;
@@ -71,7 +70,6 @@ export default class Mrkr {
     const {
       element = document.body,
       className = 'highlight',
-      selectionEnabled = false,
       onSelection,
       maximum = undefined,
       minimum = undefined,
@@ -80,7 +78,7 @@ export default class Mrkr {
 
     this.element = element;
     this.highlightClass = className;
-    this.selectionEnabled = selectionEnabled;
+    this.selectionEnabled = false;
     this.maximum = maximum;
     this.minimum = minimum;
     this.overlap = overlap;
@@ -196,6 +194,24 @@ export default class Mrkr {
   };
 
   /**
+   * Adds the event listener for pointerup
+   *
+   * @memberof Mrkr
+   */
+  private register(): void {
+    this.element.addEventListener('pointerup', this.handlePointerUp);
+  }
+
+  /**
+   * Removes the event listener for pointerup
+   *
+   * @memberof Mrkr
+   */
+  private unregister(): void {
+    this.element.removeEventListener('pointerup', this.handlePointerUp);
+  }
+
+  /**
    * Searches the container element for any highlighted nodes
    * according to the current className
    *
@@ -252,24 +268,6 @@ export default class Mrkr {
     });
 
     return data;
-  }
-
-  /**
-   * Adds the event listener for pointerup
-   *
-   * @memberof Mrkr
-   */
-  register(): void {
-    this.element.addEventListener('pointerup', this.handlePointerUp);
-  }
-
-  /**
-   * Removes the event listener for pointerup
-   *
-   * @memberof Mrkr
-   */
-  unregister(): void {
-    this.element.removeEventListener('pointerup', this.handlePointerUp);
   }
 
   /**
@@ -460,7 +458,7 @@ export default class Mrkr {
   }
 
   toggleSelection(isEnabled: boolean) {
-    this.selectionEnabled = isEnabled;
+    this.selectionEnabled = typeof isEnabled === 'undefined' ? !this.selectionEnabled : isEnabled;
   }
 
   enableSelection() {
