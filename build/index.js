@@ -1,6 +1,6 @@
 /*!
  * 
- *   mrkrjs v1.2.2
+ *   mrkrjs v1.2.3
  *   https://github.com/tmarshall/mrkrjs
  * 
  *   Copyright (c) Tanner Marshall (https://github.com/tmarshall07)
