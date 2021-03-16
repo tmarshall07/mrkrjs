@@ -1,6 +1,6 @@
 {
   "name": "mrkrjs",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Text highlighting utility.",
   "main": "build/index.js",
   "scripts": {
