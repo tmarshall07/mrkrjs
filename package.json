@@ -1,6 +1,6 @@
 {
   "name": "mrkrjs",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Text highlighting utility.",
   "main": "build/index.js",
   "scripts": {
@@ -23,7 +23,11 @@
   },
   "homepage": "https://github.com/tmarshall07/mrkrjs",
   "keywords": [
-    "library"
+    "library",
+    "text",
+    "highlighter",
+    "highlight",
+    "marker"
   ],
   "license": "MIT",
   "devDependencies": {
