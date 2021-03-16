@@ -33,29 +33,35 @@ mrkr.enableSelection();
 ```
 
 ## Options
-## `element: HTMLELement`
+### `element: HTMLELement`
 Default: `body`
+
 A target container element to apply highlighting to.
 > Note: it's usually recommended to pass a target `element`, since the default `body` can result in slower highlighting with larger pages.
 
 ### `className: string`
 Default: `'highlight'`
+
 A class name to apply to any highlighted blocks of text.
 
 ### `minimum: number`
 Default: `undefined`
+
 The minimum amount of text that must be selected to apply highlights.
 
 ### `maximum: number`
 Default: `undefined`
+
 The maximum amount of text that can be selected to apply highlights.
 
 ### `overlap: boolean`
 Default: `false`
+
 Allow overlapping highlights.
 
 ### `onSelection: (e, data) => void`
 Default: `undefined`
+
 Callback that's fired on selection with the cursor.
 
 ## Methods
