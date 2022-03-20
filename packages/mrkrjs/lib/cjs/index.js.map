@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/index.ts"],"names":["Mrkr"],"mappings":";;;;;;;AAAA;;;;eAEeA,a","sourcesContent":["import Mrkr from './Mrkr';\n\nexport default Mrkr;\n"],"file":"index.js"}

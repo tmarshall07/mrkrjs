@@ -1,5 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
-// import babel from '@rollup/plugin-babel';
+import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 
@@ -13,30 +13,30 @@ const minifierPlugin = terser({
   },
 });
 
-const typescriptPlugin = typescript({ tsconfig: '../../tsconfig.json', outputToFilesystem: false });
+const typescriptPlugin = typescript({ tsconfig: './tsconfig.json' });
 
 export default {
   input,
   output: [
     {
-      file: `dist/${name}.esm.js`,
+      file: `lib/bundles/bundle.esm.js`,
       format: 'esm',
       sourcemap: true,
     },
     {
-      file: `dist/${name}.esm.min.js`,
+      file: `lib/bundles/bundle.esm.min.js`,
       format: 'esm',
       plugins: [minifierPlugin],
       sourcemap: true,
     },
     {
-      file: `dist/${name}.js`,
+      file: `lib/bundles/bundle.umd.js`,
       format: 'umd',
       name,
       sourcemap: true,
     },
     {
-      file: `dist/${name}.min.js`,
+      file: `lib/bundles/bundle.umd.min.js`,
       format: 'umd',
       name,
       plugins: [minifierPlugin],
@@ -45,8 +45,7 @@ export default {
   ],
   external,
   plugins: [
-    typescriptPlugin,
     resolve({ extensions }),
-    // babel({ babelHelpers: 'bundled', include: ['src/**/*.ts'], extensions, exclude: './node_modules/**' }),
+    babel({ babelHelpers: 'bundled', include: ['src/**/*.ts'], extensions, exclude: './node_modules/**' }),
   ],
 };
