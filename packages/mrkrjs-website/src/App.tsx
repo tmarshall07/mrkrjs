@@ -6,6 +6,8 @@ import js from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript';
 import atomOneDark from 'react-syntax-highlighter/dist/esm/styles/hljs/atom-one-dark';
 import Mrkr from 'mrkrjs';
 
+import logo from './assets/logo.png'
+
 SyntaxHighlighter.registerLanguage('javascript', js);
 
 const Component = ({ string }: { string: string }) => {
@@ -25,7 +27,7 @@ function App() {
       <header className="App-header">
         <div className="content-container">
           <div className="header-image">
-            <img src="/logo.png" />
+            <img src={logo} />
           </div>
           <h2>Install</h2>
           <Component string="yarn add mrkrjs" />
