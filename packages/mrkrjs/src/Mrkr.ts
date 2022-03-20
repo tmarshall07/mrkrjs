@@ -359,7 +359,7 @@ export default class Mrkr {
 
     const range = selection.getRangeAt(0);
 
-    const { startContainer, endContainer } = (range as unknown) as Range;
+    const { startContainer, endContainer } = range as unknown as Range;
 
     // Ensure that results are Text nodes
     if (isTextNode(startContainer) && isTextNode(endContainer)) {
