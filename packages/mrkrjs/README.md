@@ -24,9 +24,9 @@ const mrkr = new Mrkr(document.body, 'highlight');
 ```
 
 ## Parameters
-###`element`
+### `element`
 A target container element to apply highlighting to.
-> Note: it's usually recommended to pass a target `element`, since the default `body` can result in slower highlighting with larger pages.
+> Note: Any HTMLElement works as a container, however using the `body` element can result in slower highlighting with larger pages.
 
 ### `className`
 The class name to apply to highlighted elements.
