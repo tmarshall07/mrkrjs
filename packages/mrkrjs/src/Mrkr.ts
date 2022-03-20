@@ -36,7 +36,6 @@ const textNodesUnder = (node: any): Text[] => {
 };
 
 interface Props {
-  className?: string;
   minimum?: number;
   maximum?: number;
   overlap?: boolean;
@@ -66,18 +65,13 @@ export default class Mrkr {
 
   private selectionEnabled: boolean;
 
-  constructor(element: HTMLElement, props: Props = {}) {
-    const {
-      className = 'highlight',
-      onSelection,
-      maximum = undefined,
-      minimum = undefined,
-      overlap = true,
-      selectionEnabled = true,
-    } = props;
+  constructor(element: HTMLElement, className: string, props: Props = {}) {
+    const { onSelection, maximum = undefined, minimum = undefined, overlap = true, selectionEnabled = true } = props;
 
     // Make sure element exists
-    if (!element) throw new Error('Container element is required.');
+    if (!element) throw new Error('Element is required.');
+    // Make sure className
+    if (!className) throw new Error('Class name is required.');
 
     this.element = element;
     this.highlightClass = className;

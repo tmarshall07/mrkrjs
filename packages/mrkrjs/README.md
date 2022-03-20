@@ -4,7 +4,7 @@
 </div>
 
 # MrkrJS
-Mrkr is a simple utility to apply styles to highlighted text either using the native cursor or programmatically with a set of number offsets.
+Mrkr is a simple utility to apply arbitrary styles to highlighted text either using the native cursor or programmatically with a set of number offsets.
 
 # Installation
 ```bash
@@ -19,48 +19,41 @@ yarn add mrkrjs
 ```javascript
 import Mrkr from 'mrkrjs';
 
-// Optional options object
-const options = {
-  className: 'highlight',
-  selectionEnabled: false,
-  element: document.body,
-}
-
-const mrkr = new Mrkr(options); // Create mrkr instance
-
-// Enable selection highlight
-mrkr.enableSelection();
+// Create mrkr instance
+const mrkr = new Mrkr(document.body, 'highlight');
 ```
-> Note: MrkrJS *does not* apply any default styling to the highlighted elements, so remember to add styles for your passed `className` or the default `.highlight` class.
 
-## Options
-### `element: HTMLELement`
-Default: `body`
-
+## Parameters
+###`element`
 A target container element to apply highlighting to.
 > Note: it's usually recommended to pass a target `element`, since the default `body` can result in slower highlighting with larger pages.
 
-### `className: string`
-Default: `'highlight'`
+### `className`
+The class name to apply to highlighted elements.
 
-A class name to apply to any highlighted blocks of text.
+### `options` (optional)
+An object containing intialization parameters. The possible options are:
 
-### `minimum: number`
+
+`options.minimum` _number_
 Default: `undefined`
 
 The minimum amount of text that must be selected to apply highlights.
 
-### `maximum: number`
+
+`options.maximum` _number_
 Default: `undefined`
 
 The maximum amount of text that can be selected to apply highlights.
 
-### `overlap: boolean`
+
+`options.overlap` _boolean_
 Default: `false`
 
 Allow overlapping highlights.
 
-### `onSelection: (e, data) => void`
+
+`options.onSelection` _(e, data) => void_
 Default: `undefined`
 
 Callback that's fired on selection with the cursor.

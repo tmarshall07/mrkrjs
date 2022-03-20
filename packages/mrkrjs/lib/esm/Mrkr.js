@@ -26,9 +26,8 @@ const textNodesUnder = node => {
 };
 
 export default class Mrkr {
-  constructor(element, props = {}) {
+  constructor(element, className, props = {}) {
     const {
-      className = 'highlight',
       onSelection,
       maximum = undefined,
       minimum = undefined,
@@ -36,7 +35,9 @@ export default class Mrkr {
       selectionEnabled = true
     } = props; // Make sure element exists
 
-    if (!element) throw new Error('Container element is required.');
+    if (!element) throw new Error('Element is required.'); // Make sure className
+
+    if (!className) throw new Error('Class name is required.');
     this.element = element;
     this.highlightClass = className;
     this.selectionEnabled = selectionEnabled;

@@ -53,10 +53,10 @@ var textNodesUnder = function textNodesUnder(node) {
 };
 
 var Mrkr = /*#__PURE__*/function () {
-  function Mrkr(element) {
+  function Mrkr(element, className) {
     var _this = this;
 
-    var props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var props = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     _classCallCheck(this, Mrkr);
 
@@ -91,9 +91,7 @@ var Mrkr = /*#__PURE__*/function () {
       return {};
     });
 
-    var _props$className = props.className,
-        className = _props$className === void 0 ? 'highlight' : _props$className,
-        onSelection = props.onSelection,
+    var onSelection = props.onSelection,
         _props$maximum = props.maximum,
         maximum = _props$maximum === void 0 ? undefined : _props$maximum,
         _props$minimum = props.minimum,
@@ -103,7 +101,9 @@ var Mrkr = /*#__PURE__*/function () {
         _props$selectionEnabl = props.selectionEnabled,
         selectionEnabled = _props$selectionEnabl === void 0 ? true : _props$selectionEnabl; // Make sure element exists
 
-    if (!element) throw new Error('Container element is required.');
+    if (!element) throw new Error('Element is required.'); // Make sure className
+
+    if (!className) throw new Error('Class name is required.');
     this.element = element;
     this.highlightClass = className;
     this.selectionEnabled = selectionEnabled;
