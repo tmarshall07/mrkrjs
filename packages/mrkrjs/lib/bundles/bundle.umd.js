@@ -105,10 +105,10 @@
   };
 
   var Mrkr = /*#__PURE__*/function () {
-    function Mrkr() {
+    function Mrkr(element) {
       var _this = this;
 
-      var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       _classCallCheck(this, Mrkr);
 
@@ -143,9 +143,7 @@
         return {};
       });
 
-      var _props$element = props.element,
-          element = _props$element === void 0 ? document.body : _props$element,
-          _props$className = props.className,
+      var _props$className = props.className,
           className = _props$className === void 0 ? 'highlight' : _props$className,
           onSelection = props.onSelection,
           _props$maximum = props.maximum,
@@ -153,10 +151,14 @@
           _props$minimum = props.minimum,
           minimum = _props$minimum === void 0 ? undefined : _props$minimum,
           _props$overlap = props.overlap,
-          overlap = _props$overlap === void 0 ? true : _props$overlap;
+          overlap = _props$overlap === void 0 ? true : _props$overlap,
+          _props$selectionEnabl = props.selectionEnabled,
+          selectionEnabled = _props$selectionEnabl === void 0 ? true : _props$selectionEnabl; // Make sure element exists
+
+      if (!element) throw new Error('Container element is required.');
       this.element = element;
       this.highlightClass = className;
-      this.selectionEnabled = false;
+      this.selectionEnabled = selectionEnabled;
       this.maximum = maximum;
       this.minimum = minimum;
       this.overlap = overlap;

@@ -26,18 +26,20 @@ const textNodesUnder = node => {
 };
 
 export default class Mrkr {
-  constructor(props = {}) {
+  constructor(element, props = {}) {
     const {
-      element = document.body,
       className = 'highlight',
       onSelection,
       maximum = undefined,
       minimum = undefined,
-      overlap = true
-    } = props;
+      overlap = true,
+      selectionEnabled = true
+    } = props; // Make sure element exists
+
+    if (!element) throw new Error('Container element is required.');
     this.element = element;
     this.highlightClass = className;
-    this.selectionEnabled = false;
+    this.selectionEnabled = selectionEnabled;
     this.maximum = maximum;
     this.minimum = minimum;
     this.overlap = overlap;

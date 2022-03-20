@@ -76,7 +76,6 @@ export default class Mrkr {
       selectionEnabled = true,
     } = props;
 
-    // Make sure element exists
     if (!element) throw new Error('Container element is required.');
 
     this.element = element;

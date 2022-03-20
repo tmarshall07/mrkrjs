@@ -7,11 +7,11 @@ declare type DataProps = OffsetProps & {
     nodes: Text[];
 };
 interface Props {
-    element?: HTMLElement;
     className?: string;
     minimum?: number;
     maximum?: number;
     overlap?: boolean;
+    selectionEnabled?: boolean;
     onSelection?: (e: PointerEvent, data: DataProps[]) => void;
 }
 export default class Mrkr {
@@ -22,7 +22,7 @@ export default class Mrkr {
     overlap?: boolean;
     onSelection?: (e: PointerEvent, data: DataProps[]) => void;
     private selectionEnabled;
-    constructor(props?: Props);
+    constructor(element: HTMLElement, props?: Props);
     /**
      * Callback run on pointerup
      *
