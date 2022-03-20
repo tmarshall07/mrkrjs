@@ -2,18 +2,14 @@
 
 # dependencies
 /node_modules
-/packages/mrkrjs/node_modules
 /.pnp
 .pnp.js
-
-# Package lock
 
 # testing
 /coverage
 
 # production
-#/build
-packages/mrkrjs/.rollup.cache
+/build
 
 # misc
 .DS_Store

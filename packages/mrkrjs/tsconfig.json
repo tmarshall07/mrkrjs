@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "outDir": "lib/types",
+    "strict": true
+  },
+  "include": [
+    "./src/index.ts"
+  ],
+}
