@@ -1,3 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+.header-image {
+  max-width: 500px;
+  width: 100%;
+  margin: 0 16px 0 16px;
+}
+
+.header-image img {
+  width: 100%;
+}
+
+h1,h2,h3,h4,h5,p {
+  font-family: 'Open Sans';
+}
+
 .content-container {
   display: flex;
   flex-direction: column;
@@ -19,14 +35,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #8C9AFF;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #2a2d41;
 }
 
 .App-link {

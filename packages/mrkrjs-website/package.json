@@ -43,6 +43,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-syntax-highlighter": "^13.5.2"
+    "@types/react-syntax-highlighter": "^13.5.2",
+    "eslint-plugin-react": "^7.29.4"
   }
 }
