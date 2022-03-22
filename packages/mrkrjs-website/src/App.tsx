@@ -18,9 +18,12 @@ const Component = ({ string }: { string: string }) => {
   );
 };
 
-
 function App() {
-  useRef<Mrkr>(new Mrkr(document.body, 'highlight'));
+  const mrkrRef = useRef<Mrkr>(new Mrkr(document.body, 'highlight'));
+
+  const handleClear = () => {
+    mrkrRef.current.clear();
+  }
 
   return (
     <div className="App">
@@ -46,6 +49,7 @@ const mrkr = new Mrkr(element, 'highlight');`} />
           <p style={{ lineHeight: '1.25em' }}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </p>
+          <button style={{ padding: '8px 16px', outline: 'none', boxShadow: 'none', border: 'none', color: 'white', borderRadius: 5, fontSize: '1em', cursor: 'pointer', backgroundColor: '#2d3671'}} onClick={handleClear}>Reset</button>
         </div>
       </header>
     </div>
