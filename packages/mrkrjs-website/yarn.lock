@@ -6040,10 +6040,10 @@ mkdirp@^0.5.5, mkdirp@~0.5.1:
   dependencies:
     minimist "^1.2.5"
 
-mrkrjs@2.0.0-beta.2:
-  version "2.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/mrkrjs/-/mrkrjs-2.0.0-beta.2.tgz#a6b645b769313a211c91db791728ad0ad9499ce9"
-  integrity sha512-maaTKH1b5jUm5XdQO4+YKiekUnEQJuXDcT2FQ1UOPeko23clJhcf5+oNit+t2IVGjnQaXXwKtVopwuYG4HP58Q==
+mrkrjs@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/mrkrjs/-/mrkrjs-2.0.2.tgz#c47be33d9edd111ce1f2d2b98883095569af9285"
+  integrity sha512-gwyha6Yt4RUOO/j+lF55A6d33Hd4ak4S5LYh/DOnNh4Q5TH5YPIzCRBO94hTN/lrGbZKtV5VFLz3frW393/sdw==
 
 ms@2.0.0:
   version "2.0.0"
