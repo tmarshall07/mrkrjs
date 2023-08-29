@@ -183,7 +183,7 @@ export default class Mrkr {
       return false;
     });
 
-    if (absoluteStartOffset && absoluteEndOffset) {
+    if (absoluteStartOffset !== undefined && absoluteEndOffset) {
       return { startOffset: absoluteStartOffset, endOffset: absoluteEndOffset };
     }
 
